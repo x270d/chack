@@ -11,8 +11,7 @@ import { Spinner } from "../ui/Spinner";
 export const Home = () => {
     const dispatch = useDispatch();
     const category = useSelector((state: RootState) => state.categories);
-    const joke = useSelector((state: RootState) => state.joke.data);
-    const jokeLoading = useSelector((state: RootState) => state.joke.isFetching);
+    const { isFetching, data, error } = useSelector((state: RootState) => state.joke);
     const myJoke: string[] = useSelector((state: RootState) => state.likeJoke);
     const [jokeTmt, setJokeTmt] = useState(false);
     const [jokeCat, setJokeCat] = useState('');
@@ -36,14 +35,14 @@ export const Home = () => {
         }
     }
 
-    const spinner = jokeLoading && <Spinner />
-    const errorMessage = !joke && !jokeLoading && <h1>Error joke load</h1>
-    const content = joke && (
+    const spinner = isFetching && <Spinner />
+    const errorMessage = error && !isFetching && <h1>Error joke load</h1>
+    const content = data && (
         <div>
-            <JokeBox >{joke.value}</JokeBox>
-            {(myJoke.includes(joke.value)) ?
-                <Button onClick={() => dispatch(deleteJoke(joke.value))}>Clear</Button> :
-                <Button onClick={() => dispatch(addNewJoke(joke.value))}>Add Joke</Button>}
+            <JokeBox >{data.value}</JokeBox>
+            {(myJoke.includes(data.value)) ?
+                <Button onClick={() => dispatch(deleteJoke(data.value))}>Clear</Button> :
+                <Button onClick={() => dispatch(addNewJoke(data.value))}>Add Joke</Button>}
 
             <Button
                 disabled={jokeCat === ''}
@@ -68,8 +67,8 @@ export const Home = () => {
                 ))}
             </CategoryList>
             {spinner}
-            {errorMessage}
             {content}
+            {errorMessage}
         </Container >
     )
 }
